@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    "jsx": "react-jsx",
+    "types": [],
+
+    "strict": true,
+    "noImplicitOverride": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "exactOptionalPropertyTypes": true,
+    "forceConsistentCasingInFileNames": true,
+
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+
+    "baseUrl": ".",
+    "paths": {
+      "@webgine/engine": ["packages/engine/src/index.ts"],
+      "@webgine/engine/*": ["packages/engine/src/*"],
+      "@webgine/scripting": ["packages/scripting/src/index.ts"],
+      "@webgine/scripting/*": ["packages/scripting/src/*"]
+    }
+  }
+}
