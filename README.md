@@ -47,10 +47,31 @@ npm run lint        # ESLint
 npm run format      # Prettier --write
 ```
 
+## Scripting
+
+Game-object behaviour is authored in TypeScript. A script is a component: subclass
+`Script` (from `@webgine/scripting`), attach it to a GameObject via `ScriptComponent`, and
+it is driven by the scene's update loop. Scripts reach the scenegraph through a curated
+interface (`gameObject` / `transform` / `world`) — they can read/write, spawn objects, and
+destroy themselves, but never touch raw engine internals. Fields marked `@serialize` become
+public parameters the editor enumerates and edits. Sources are compiled in-browser with
+esbuild-wasm and **hot-reload** live, preserving parameter values across reloads.
+
+```ts
+import { Script, serialize, Vector3 } from '@webgine/scripting';
+
+export class Spinner extends Script {
+  @serialize({ min: 0, max: 6 }) speed = 1.5;
+  override tick(dt: number): void {
+    this.transform.rotate(Vector3.up(), this.speed * dt);
+  }
+}
+```
+
 ## Roadmap
 
-1. **Project & monorepo setup** ← current
-2. Engine core — WebGPU rendering, scenegraph, component/ECS model
-3. Script engine & hot reload
+1. ✅ Project & monorepo setup
+2. ✅ Engine core — WebGPU rendering, scenegraph, component model
+3. ✅ Script engine & hot reload
 4. Editor — Inspector that enumerates script parameters
 5. Physics — Rapier integration

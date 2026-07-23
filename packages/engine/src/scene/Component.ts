@@ -10,4 +10,10 @@ export abstract class Component {
 
   /** Advance this component's behaviour each frame. */
   update(_dtSeconds: number): void {}
+
+  /**
+   * Called when the component is detached from its owner - by removeComponent or when the
+   * owning GameObject is disposed. Use it to release resources or run teardown behaviour.
+   */
+  onDetach(): void {}
 }

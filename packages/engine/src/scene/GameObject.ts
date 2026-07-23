@@ -50,11 +50,12 @@ export class GameObject extends Node {
     return undefined;
   }
 
-  /** Detaches `component`. Returns false if it was not attached here. */
+  /** Detaches `component`, firing its onDetach hook. Returns false if not attached here. */
   removeComponent(component: Component): boolean {
     const i = this._components.indexOf(component);
     if (i < 0) return false;
     this._components.splice(i, 1);
+    component.onDetach();
     return true;
   }
 
@@ -62,6 +63,12 @@ export class GameObject extends Node {
 
   update(dtSeconds: number): void {
     for (const component of this._components) component.update(dtSeconds);
+  }
+
+  /** Detaches every component (firing onDetach on each). Call when destroying the object. */
+  dispose(): void {
+    const components = this._components.splice(0);
+    for (const component of components) component.onDetach();
   }
 
   /** The node's local matrix is this object's transform (the single source of truth). */

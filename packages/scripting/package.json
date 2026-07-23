@@ -18,5 +18,12 @@
   "scripts": {
     "build": "vite build",
     "test": "vitest run"
+  },
+  "dependencies": {
+    "@webgine/engine": "*",
+    "esbuild-wasm": "^0.24.2"
+  },
+  "devDependencies": {
+    "@webgpu/types": "^0.1.52"
   }
 }

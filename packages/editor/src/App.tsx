@@ -8,7 +8,7 @@ import {
   Typography,
   createTheme,
 } from '@mui/material';
-import { Viewport } from './Viewport';
+import { Workspace } from './Workspace';
 
 /**
  * Editor shell: an app bar over the WebGPU viewport that renders the demo scene through
@@ -28,7 +28,7 @@ export function App() {
             </Typography>
           </Toolbar>
         </AppBar>
-        <Viewport />
+        <Workspace />
       </Box>
     </ThemeProvider>
   );

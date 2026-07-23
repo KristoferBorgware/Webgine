@@ -47,10 +47,16 @@ export class Scene {
     });
   }
 
-  /** Advance every GameObject in the graph. */
+  /**
+   * Advance every GameObject in the graph. Objects are collected into a snapshot first, so
+   * behaviour that spawns or destroys objects mid-update cannot corrupt the traversal (new
+   * objects tick next frame; destroyed objects have no components left and tick as no-ops).
+   */
   update(dtSeconds: number): void {
+    const objects: GameObject[] = [];
     this.root.traversePreOrder((node) => {
-      if (node instanceof GameObject) node.update(dtSeconds);
+      if (node instanceof GameObject) objects.push(node);
     });
+    for (const object of objects) object.update(dtSeconds);
   }
 }

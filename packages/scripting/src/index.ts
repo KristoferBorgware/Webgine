@@ -1,11 +1,22 @@
-/**
- * `@webgine/scripting` — the TypeScript component runtime for game-object behaviour.
- *
- * Plan 3 fills this in: a MonoBehaviour-style `Component` base class, decorators
- * (`@serialize`, `@range`, …) that populate a per-class metadata registry the editor
- * enumerates, and the esbuild/swc compile + hot-reload loader. For now this is an empty
- * skeleton so the package exists in the monorepo and builds.
- */
+// @webgine/scripting - the TypeScript component runtime for game-object behaviour.
+// User scripts import from this package: the Script base class, the @serialize decorator,
+// the curated scene handles, and the math types needed for authoring.
 
-/** Placeholder marker export; replaced by the component runtime in Plan 3. */
-export const SCRIPTING_PACKAGE = '@webgine/scripting';
+export { Script } from './Script';
+export type { ScriptBinding } from './Script';
+export { ScriptComponent } from './ScriptComponent';
+export { ScriptRuntime } from './ScriptRuntime';
+export type { ScriptRuntimeOptions, ScriptParameter } from './ScriptRuntime';
+export {
+  serialize,
+  getScriptParameters,
+  getParameterKeys,
+  applyParameters,
+  readParameters,
+} from './parameters';
+export type { ParamMeta, ParamType, ParamOptions } from './parameters';
+export { ScriptGameObject, ScriptTransform, ScriptWorld } from './handles';
+export type { ScriptContext } from './handles';
+
+// Re-exported for script authoring (scripts import only from '@webgine/scripting').
+export { Vector3, Quaternion } from '@webgine/engine';
