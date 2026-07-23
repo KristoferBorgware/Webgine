@@ -1,11 +1,13 @@
+import { Scene } from '../scene/Scene';
+
 /**
- * The transport-agnostic engine instance.
- *
- * `EngineCore` owns the engine's runtime state and knows nothing about the editor or any
- * transport. It can be instantiated directly for standalone/headless use and in tests.
- * Rendering, the scenegraph and the component model are added in Plan 2.
+ * The engine instance. Owns the runtime state - currently the active {@link Scene} and the
+ * update-loop run flag. Rendering is driven separately by a SceneRenderer; the core itself
+ * has no GPU dependency, so it can run headless (tests, tooling).
  */
 export class EngineCore {
+  readonly scene = new Scene();
+
   private running = false;
 
   /** Whether the engine's update loop is currently running. */
@@ -19,5 +21,10 @@ export class EngineCore {
 
   stop(): void {
     this.running = false;
+  }
+
+  /** Advance the scene by one step. */
+  update(dtSeconds: number): void {
+    this.scene.update(dtSeconds);
   }
 }
