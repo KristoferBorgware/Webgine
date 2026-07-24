@@ -10,6 +10,10 @@ export default defineConfig({
       formats: ['es'],
       fileName: 'index',
     },
+    rollupOptions: {
+      // The physics WASM backend is provided by the consumer, not bundled into the lib.
+      external: [/^@dimforge\/rapier3d-compat/],
+    },
     sourcemap: true,
   },
   test: {

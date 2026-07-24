@@ -15,6 +15,15 @@ export interface ComponentDescriptor {
   [field: string]: unknown;
 }
 
+/**
+ * A component's serialized form (its `type` plus type-specific fields), without the record
+ * id the serializer assigns. Returned by {@link Component.serialize}.
+ */
+export interface SerializedComponent {
+  type: string;
+  [field: string]: unknown;
+}
+
 export abstract class Component {
   constructor(readonly owner: GameObject) {}
 
@@ -27,8 +36,19 @@ export abstract class Component {
    */
   onDetach(): void {}
 
+  /**
+   * Called when the editor stops play, after transforms are restored, so a component can
+   * reset any extra state it accumulated during play (e.g. a physics body's pose/velocity).
+   */
+  onSceneReset(): void {}
+
   /** Editor-facing description of this component. */
   describe(): ComponentDescriptor {
     return { kind: 'component' };
+  }
+
+  /** Serialized form for scene persistence, or null if this component is not persisted. */
+  serialize(): SerializedComponent | null {
+    return null;
   }
 }

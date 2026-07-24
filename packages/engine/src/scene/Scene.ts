@@ -4,6 +4,7 @@
 
 import { AABB } from '../math/AABB';
 import { Camera } from '../camera/Camera';
+import type { PhysicsWorld } from '../physics/PhysicsWorld';
 import { GameObject } from './GameObject';
 import { MeshComponent } from './MeshComponent';
 import { Node } from './Node';
@@ -29,6 +30,9 @@ export function worldBounds(node: Node): AABB {
 export class Scene {
   readonly root = new Node('root');
 
+  /** Optional physics simulation stepped each update (before GameObjects tick). */
+  physics: PhysicsWorld | null = null;
+
   private _activeCamera: Camera | null = null;
 
   get activeCamera(): Camera | null {
@@ -53,6 +57,7 @@ export class Scene {
    * objects tick next frame; destroyed objects have no components left and tick as no-ops).
    */
   update(dtSeconds: number): void {
+    this.physics?.step(dtSeconds);
     const objects: GameObject[] = [];
     this.root.traversePreOrder((node) => {
       if (node instanceof GameObject) objects.push(node);

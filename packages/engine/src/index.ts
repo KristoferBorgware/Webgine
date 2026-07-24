@@ -15,9 +15,14 @@ export * from './scene/Node';
 export * from './scene/Component';
 export * from './scene/GameObject';
 export * from './scene/MeshComponent';
+export * from './scene/RigidBodyComponent';
 export * from './scene/Scene';
 export * from './scene/primitives';
 export * from './scene/raycast';
+
+// Physics
+export * from './physics/PhysicsWorld';
+export * from './physics/RigidBody';
 
 // Cameras
 export * from './camera/Camera';

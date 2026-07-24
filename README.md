@@ -68,10 +68,25 @@ export class Spinner extends Script {
 }
 ```
 
+## Physics & scenes
+
+Physics runs on [Rapier](https://rapier.rs/) (`@dimforge/rapier3d-compat`) behind an
+engine-owned `PhysicsWorld` abstraction, so the backend stays swappable. A
+`RigidBodyComponent` drives its GameObject from the simulation; the scene steps physics
+only while the editor is **playing**, and **Stop** performs a full reset (transforms and
+bodies) via each component's `onSceneReset()` hook.
+
+Scenes are authored in YAML (a flat, id-referenced document) and loaded at startup — see
+[`packages/editor/scenes/demo.yaml`](packages/editor/scenes/demo.yaml), which sets up a
+ground plane, a falling cube that lands on it, and the scripted spinner. The serializer
+dispatches each component record to a factory by `type`; the engine registers mesh and
+rigid-body factories, and the editor plugs in the script factory — so the engine never
+depends on the scripting layer.
+
 ## Roadmap
 
 1. ✅ Project & monorepo setup
 2. ✅ Engine core — WebGPU rendering, scenegraph, component model
 3. ✅ Script engine & hot reload
 4. ✅ Editor — hierarchy / viewport / inspector panels, selection + picking, play state
-5. Physics — Rapier integration
+5. ✅ Physics — Rapier integration, ground + falling cube, YAML scene loading

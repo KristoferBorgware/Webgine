@@ -4,6 +4,8 @@
 // id and lists its `components` by id) rather than by nesting. This keeps records
 // order-independent, appendable and diff-able.
 
+import type { SerializedComponent } from '../scene/Component';
+
 export interface TransformDesc {
   position: [number, number, number];
   /** Quaternion [x, y, z, w]. */
@@ -11,12 +13,13 @@ export interface TransformDesc {
   scale: [number, number, number];
 }
 
-/** One component record. `type` selects which extra fields are meaningful. */
-export interface ComponentDesc {
+/**
+ * One component record: a serialized component ({@link SerializedComponent}: a `type` plus
+ * type-specific fields) with the id it is referenced by. The schema is open so new component
+ * types serialize without the serializer hard-coding them; `instantiate` dispatches on `type`.
+ */
+export interface ComponentDesc extends SerializedComponent {
   id: string;
-  type: 'MeshComponent';
-  /** MeshComponent: which built-in primitive supplies the geometry. */
-  primitive: 'cube';
 }
 
 /** One entity record. `parent` is null for a root-level object. */

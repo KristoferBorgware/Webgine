@@ -4,7 +4,7 @@
 
 import type { AABB } from '../math/AABB';
 import type { MeshData } from '../render/mesh';
-import { Component, type ComponentDescriptor } from './Component';
+import { Component, type ComponentDescriptor, type SerializedComponent } from './Component';
 import type { GameObject } from './GameObject';
 
 export class MeshComponent extends Component {
@@ -21,5 +21,9 @@ export class MeshComponent extends Component {
 
   override describe(): ComponentDescriptor {
     return { kind: 'mesh', primitive: this.primitive };
+  }
+
+  override serialize(): SerializedComponent | null {
+    return this.primitive ? { type: 'MeshComponent', primitive: this.primitive } : null;
   }
 }

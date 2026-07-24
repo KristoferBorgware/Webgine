@@ -1,0 +1,73 @@
+# Webgine demo scene - a static ground, a falling/tumbling cube that lands on it, and a
+# script-driven spinning cube. The format is flat with id references: every GameObject and
+# every Component is a top-level record, and relationships are id references (a GameObject
+# names its parent by id, null = root, and lists its components by id into the components
+# table). The loader resolves the graph by id and dispatches each component record to a
+# factory by its type.
+scene:
+  name: Webgine Demo Scene
+
+gameObjects:
+  # Static floor: a large rendered quad plus a fixed collider, at the origin.
+  - id: ecec7a8e-3683-4a99-99e6-1578fd5ddba3
+    name: ground
+    parent: ~
+    children: []
+    transform:
+      position: [0, 0, 0]
+      rotation: [0, 0, 0, 1]
+      scale: [1, 1, 1]
+    components: [bde22cfc-1a72-444b-b2be-c0fd3f7e2ceb, d039bdd1-5e21-4122-9184-5077420abd52]
+
+  # Dynamic cube: spawns at y=8 and drops onto the ground with an initial tumble.
+  - id: 4d395e13-b03d-4432-9f6a-5a0d07cde63b
+    name: cube
+    parent: ~
+    children: []
+    transform:
+      position: [0, 8, 0]
+      rotation: [0, 0, 0, 1]
+      scale: [1, 1, 1]
+    components: [646d6106-feee-45b8-a304-7c030076d167, 9c57f107-50b9-4b1c-a300-3f44831b642a]
+
+  # Scripted spinner: a mesh-only cube whose script rotates it in place, parked to the side.
+  - id: fc261416-ce19-4a1c-8686-0bf995c13016
+    name: spinner
+    parent: ~
+    children: []
+    transform:
+      position: [4, 1, 0]
+      rotation: [0, 0, 0, 1]
+      scale: [1, 1, 1]
+    components: [83c1e0e5-6c81-4743-ab71-082c8b3e15f2, 76832ece-d0c0-4d00-8e07-408929d5799b]
+
+# Flat, id-keyed component table. Order is irrelevant; records are reached by id reference.
+components:
+  - id: bde22cfc-1a72-444b-b2be-c0fd3f7e2ceb
+    type: MeshComponent
+    primitive: ground
+
+  - id: d039bdd1-5e21-4122-9184-5077420abd52
+    type: RigidBodyComponent
+    body: staticGround
+    halfExtents: [15, 0.1, 15]
+    y: 0
+
+  - id: 646d6106-feee-45b8-a304-7c030076d167
+    type: MeshComponent
+    primitive: cube
+
+  - id: 9c57f107-50b9-4b1c-a300-3f44831b642a
+    type: RigidBodyComponent
+    body: dynamicBox
+    halfExtents: [1, 1, 1]
+    density: 10
+    angularVelocity: [2, 1, 3]
+
+  - id: 83c1e0e5-6c81-4743-ab71-082c8b3e15f2
+    type: MeshComponent
+    primitive: cube
+
+  - id: 76832ece-d0c0-4d00-8e07-408929d5799b
+    type: ScriptComponent
+    typeName: Spinner

@@ -184,12 +184,19 @@ export class EditorHost {
     if (this.playState === 'playing') this.setState('paused');
   }
 
-  /** Restores the pre-play transforms and returns to editing. */
+  /** Restores the pre-play transforms and returns to editing (a full state reset). */
   stop(): void {
     if (this.snapshot) {
       this.restoreTransforms(this.snapshot);
       this.snapshot = null;
     }
+    // With transforms restored, let each component reset its own extra state (e.g. reset a
+    // physics body to the restored pose with zero velocity).
+    this.scene.root.traversePreOrder((node) => {
+      if (node instanceof GameObject) {
+        for (const component of node.components) component.onSceneReset();
+      }
+    });
     this.setState('editing');
   }
 

@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Box, Divider } from '@mui/material';
 import {
-  createCube,
   createSceneRenderer,
   EditorHost,
   OrbitCamera,
+  PhysicsWorld,
   Scene,
+  SceneSerializer,
+  Vector3,
   type InspectorData,
   type PlayState,
   type SceneRendererHandle,
@@ -13,6 +15,7 @@ import {
 } from '@webgine/engine';
 import { ScriptComponent, ScriptRuntime, type ScriptParameter } from '@webgine/scripting';
 import esbuildWasmURL from 'esbuild-wasm/esbuild.wasm?url';
+import sceneYaml from '../scenes/demo.yaml?raw';
 import { DEMO_SCRIPT } from './demoScript';
 import { Toolbar } from './Toolbar';
 import { HierarchyPanel } from './HierarchyPanel';
@@ -73,11 +76,11 @@ export function Editor() {
     let off = () => {};
 
     const scene = new Scene();
-    const cube = createCube(scene.root, 'cube');
     const camera = scene.root.addChild(new OrbitCamera('camera'));
     camera.active = true;
-    camera.distance = 8;
-    camera.update({ orbitY: 30 });
+    camera.focus = new Vector3(0, 2, 0);
+    camera.distance = 22;
+    camera.update({ orbitY: 25 });
     scene.refreshActiveCamera();
 
     const host = new EditorHost(scene);
@@ -91,7 +94,23 @@ export function Editor() {
         await runtime.initialize();
         runtime.setSources(new Map([['Spinner.ts', DEMO_SCRIPT]]));
         await runtime.reloadNow();
-        cube.addComponent(ScriptComponent, runtime, 'Spinner');
+
+        // Load the scene from the authored YAML: the engine builds mesh/rigid-body
+        // components; the editor supplies the ScriptComponent factory over the runtime.
+        const world = await PhysicsWorld.create();
+        scene.physics = world;
+        SceneSerializer.instantiate(SceneSerializer.parse(sceneYaml), scene.root, {
+          physics: world,
+          factories: {
+            ScriptComponent: (obj, desc) =>
+              obj.addComponent(
+                ScriptComponent,
+                runtime,
+                String(desc.typeName),
+                (desc.parameters as Record<string, unknown>) ?? {},
+              ),
+          },
+        });
 
         hostRef.current = host;
         runtimeRef.current = runtime;

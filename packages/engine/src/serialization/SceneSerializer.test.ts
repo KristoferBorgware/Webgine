@@ -1,7 +1,105 @@
 import { describe, expect, it } from 'vitest';
+import { Vector3 } from '../math/Vector3';
+import { Component } from '../scene/Component';
 import { GameObject } from '../scene/GameObject';
+import { RigidBodyComponent } from '../scene/RigidBodyComponent';
 import { Scene } from '../scene/Scene';
+import { createFallingCube, createGround } from '../scene/primitives';
+import { PhysicsWorld } from '../physics/PhysicsWorld';
 import { buildDemoScene, capture, emit, instantiate, parse } from './SceneSerializer';
+
+const FULL_SCENE_YAML = `
+scene:
+  name: Physics Demo
+gameObjects:
+  - id: g
+    name: ground
+    parent: ~
+    children: []
+    transform: { position: [0, 0, 0], rotation: [0, 0, 0, 1], scale: [1, 1, 1] }
+    components: [gm, gb]
+  - id: c
+    name: cube
+    parent: ~
+    children: []
+    transform: { position: [0, 8, 0], rotation: [0, 0, 0, 1], scale: [1, 1, 1] }
+    components: [cm, cb]
+  - id: s
+    name: spinner
+    parent: ~
+    children: []
+    transform: { position: [4, 1, 0], rotation: [0, 0, 0, 1], scale: [1, 1, 1] }
+    components: [sm, ss]
+components:
+  - { id: gm, type: MeshComponent, primitive: ground }
+  - { id: gb, type: RigidBodyComponent, body: staticGround, halfExtents: [15, 0.1, 15], y: 0 }
+  - { id: cm, type: MeshComponent, primitive: cube }
+  - { id: cb, type: RigidBodyComponent, body: dynamicBox, halfExtents: [1, 1, 1], density: 10, angularVelocity: [2, 1, 3] }
+  - { id: sm, type: MeshComponent, primitive: cube }
+  - { id: ss, type: ScriptComponent, typeName: Spinner }
+`;
+
+class StubScript extends Component {
+  constructor(
+    owner: GameObject,
+    readonly typeName: string,
+  ) {
+    super(owner);
+  }
+}
+
+describe('SceneSerializer physics + scripts', () => {
+  it('instantiates mesh, rigid-body and script components via factories', async () => {
+    const world = await PhysicsWorld.create();
+    const scene = new Scene();
+    scene.physics = world;
+
+    const count = instantiate(parse(FULL_SCENE_YAML), scene.root, {
+      physics: world,
+      factories: {
+        ScriptComponent: (obj, desc) => obj.addComponent(StubScript, String(desc.typeName)),
+      },
+    });
+    expect(count).toBe(3);
+
+    const ground = scene.root.findByName('ground');
+    const cube = scene.root.findByName('cube');
+    const spinner = scene.root.findByName('spinner');
+    expect(ground).toBeInstanceOf(GameObject);
+    if (ground instanceof GameObject) {
+      expect(ground.getComponent(RigidBodyComponent)?.bodyKind).toBe('static');
+    }
+    if (cube instanceof GameObject) {
+      expect(cube.getComponent(RigidBodyComponent)?.bodyKind).toBe('dynamic');
+    }
+    if (spinner instanceof GameObject) {
+      expect(spinner.getComponent(StubScript)?.typeName).toBe('Spinner');
+    }
+  });
+
+  it('captures rigid-body components back to records that round-trip', async () => {
+    const world = await PhysicsWorld.create();
+    const scene = new Scene();
+    scene.physics = world;
+    createGround(scene.root, world);
+    createFallingCube(scene.root, world, new Vector3(0, 5, 0));
+
+    const restored = parse(emit(capture(scene, 'T')));
+    const types = restored.components.map((c) => c.type).sort();
+    expect(types).toEqual([
+      'MeshComponent',
+      'MeshComponent',
+      'RigidBodyComponent',
+      'RigidBodyComponent',
+    ]);
+
+    const dynamic = restored.components.find(
+      (c) => c.type === 'RigidBodyComponent' && c.body === 'dynamicBox',
+    );
+    expect(dynamic?.density).toBe(10);
+    expect(dynamic?.angularVelocity).toEqual([2, 1, 3]);
+  });
+});
 
 describe('SceneSerializer', () => {
   it('round-trips a document through YAML text', () => {
