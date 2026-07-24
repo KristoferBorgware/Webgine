@@ -46,6 +46,22 @@ export class Quaternion {
     );
   }
 
+  // Euler angles (radians) as (pitch about X, yaw about Y, roll about Z) - the inverse of
+  // fromEuler. Extracted from the rotation matrix in the matching order; the pitch axis is
+  // the middle rotation, so it clamps at +/- 90 degrees (gimbal-lock fallback zeroes roll).
+  toEuler(): Vector3 {
+    const { x, y, z, w } = this;
+    const m9 = 2 * (y * z - w * x); // R[1][2]
+    const pitch = Math.asin(-Math.min(Math.max(m9, -1), 1));
+    if (Math.abs(m9) < 0.9999999) {
+      const yaw = Math.atan2(2 * (x * z + w * y), 1 - 2 * (x * x + y * y)); // R[0][2], R[2][2]
+      const roll = Math.atan2(2 * (x * y + w * z), 1 - 2 * (x * x + z * z)); // R[1][0], R[1][1]
+      return new Vector3(pitch, yaw, roll);
+    }
+    const yaw = Math.atan2(-2 * (x * z - w * y), 1 - 2 * (y * y + z * z)); // R[2][0], R[0][0]
+    return new Vector3(pitch, yaw, 0);
+  }
+
   // Shortest-arc rotation taking direction `from` onto direction `to`.
   static fromToRotation(from: Vector3, to: Vector3): Quaternion {
     const f = from.safeNormalized(Vector3.forward());

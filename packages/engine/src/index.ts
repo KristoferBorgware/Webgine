@@ -40,10 +40,14 @@ export * as SceneSerializer from './serialization/SceneSerializer';
 // Engine core + editor facade
 export { EngineCore } from './core/EngineCore';
 export { EditorHost } from './editor/EditorHost';
+export type { PlayState } from './editor/PlayState';
+export type { ComponentDescriptor } from './scene/Component';
 export type {
-  Command,
   EngineEvent,
   EngineEventListener,
-  PingCommand,
-  PongEvent,
+  SelectionChangedEvent,
+  PlayStateChangedEvent,
+  TreeNode,
+  TransformState,
+  InspectorData,
 } from './editor/messages';

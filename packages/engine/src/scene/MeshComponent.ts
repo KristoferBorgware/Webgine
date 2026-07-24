@@ -4,7 +4,7 @@
 
 import type { AABB } from '../math/AABB';
 import type { MeshData } from '../render/mesh';
-import { Component } from './Component';
+import { Component, type ComponentDescriptor } from './Component';
 import type { GameObject } from './GameObject';
 
 export class MeshComponent extends Component {
@@ -17,5 +17,9 @@ export class MeshComponent extends Component {
     readonly primitive: string = '',
   ) {
     super(owner);
+  }
+
+  override describe(): ComponentDescriptor {
+    return { kind: 'mesh', primitive: this.primitive };
   }
 }

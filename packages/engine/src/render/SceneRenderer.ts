@@ -34,6 +34,11 @@ export interface SceneRendererHandle {
 export interface CreateSceneRendererOptions {
   /** Reports asynchronous GPU device/validation errors that otherwise fail silently. */
   onDeviceError?: (message: string) => void;
+  /**
+   * Per-frame update step. Defaults to `scene.update(dt)`; the editor overrides it to route
+   * updates through its play-state gate so the simulation only advances while playing.
+   */
+  onUpdate?: (dtSeconds: number) => void;
 }
 
 /**
@@ -74,8 +79,9 @@ export async function createSceneRenderer(
   const resources = new Map<MeshComponent, ObjectResources>();
   const resize = new CanvasResizer(canvas);
 
+  const step = options.onUpdate ?? ((dt: number) => scene.update(dt));
   const draw = ({ pass, dt, width, height }: FrameContext): void => {
-    scene.update(dt);
+    step(dt);
     const camera = scene.activeCamera;
     if (!camera || height === 0) return;
 

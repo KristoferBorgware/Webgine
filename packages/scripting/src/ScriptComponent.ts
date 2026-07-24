@@ -4,7 +4,7 @@
 // touching this component. onDetach (fired by removeComponent / GameObject.dispose) tears
 // the script down.
 
-import { Component, type GameObject } from '@webgine/engine';
+import { Component, type ComponentDescriptor, type GameObject } from '@webgine/engine';
 import type { ScriptRuntime } from './ScriptRuntime';
 
 export class ScriptComponent extends Component {
@@ -27,5 +27,9 @@ export class ScriptComponent extends Component {
 
   override onDetach(): void {
     this.runtime.destroy(this.id);
+  }
+
+  override describe(): ComponentDescriptor {
+    return { kind: 'script', scriptId: this.id, typeName: this.typeName };
   }
 }

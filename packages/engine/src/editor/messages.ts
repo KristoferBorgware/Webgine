@@ -1,30 +1,45 @@
-/**
- * Serializable command/event protocol between the editor and the engine.
- *
- * The editor drives the engine by dispatching {@link Command} objects; the engine
- * reports back by emitting {@link EngineEvent} objects. In Plan 1 these travel via direct
- * in-process calls, but keeping them as plain serializable objects leaves the door open
- * to a transport (e.g. a future Worker boundary) without touching call sites.
- *
- * Feature commands/events (scene mutation, selection, inspector metadata, play/pause) are
- * added in later plans. `ping`/`pong` exists now purely to prove the seam end to end.
- */
+// The editor-facing protocol: the data the editor reads from the engine and the events the
+// engine emits back. The editor calls EditorHost methods directly (single realm); events
+// notify it of selection and play-state changes. Shapes are plain/serializable so a future
+// transport could carry them unchanged.
 
-/** A command sent from the editor to the engine. */
-export type Command = PingCommand;
+import type { ComponentDescriptor } from '../scene/Component';
+import type { PlayState } from './PlayState';
 
-/** An event emitted from the engine to the editor. */
-export type EngineEvent = PongEvent;
-
-export interface PingCommand {
-  readonly type: 'ping';
-  /** Echoed back on the matching {@link PongEvent} so round-trips can be correlated. */
-  readonly nonce: number;
+/** A node in the scene hierarchy as shown by the editor. */
+export interface TreeNode {
+  id: string;
+  name: string;
+  kind: 'gameObject' | 'camera' | 'node';
+  children: TreeNode[];
 }
 
-export interface PongEvent {
-  readonly type: 'pong';
-  readonly nonce: number;
+/** A GameObject's transform for the inspector: position, Euler rotation (degrees), scale. */
+export interface TransformState {
+  position: [number, number, number];
+  rotation: [number, number, number];
+  scale: [number, number, number];
+}
+
+/** Everything the inspector shows for the selected GameObject. */
+export interface InspectorData {
+  id: string;
+  name: string;
+  transform: TransformState;
+  components: ComponentDescriptor[];
+}
+
+/** An event emitted from the engine to the editor. */
+export type EngineEvent = SelectionChangedEvent | PlayStateChangedEvent;
+
+export interface SelectionChangedEvent {
+  readonly type: 'selectionChanged';
+  readonly id: string | null;
+}
+
+export interface PlayStateChangedEvent {
+  readonly type: 'playStateChanged';
+  readonly state: PlayState;
 }
 
 /** Listener invoked for every event the engine emits. */

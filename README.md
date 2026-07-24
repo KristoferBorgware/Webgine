@@ -73,5 +73,5 @@ export class Spinner extends Script {
 1. ✅ Project & monorepo setup
 2. ✅ Engine core — WebGPU rendering, scenegraph, component model
 3. ✅ Script engine & hot reload
-4. Editor — Inspector that enumerates script parameters
+4. ✅ Editor — hierarchy / viewport / inspector panels, selection + picking, play state
 5. Physics — Rapier integration

@@ -38,6 +38,18 @@ describe('Matrix4x4', () => {
   });
 });
 
+describe('Quaternion', () => {
+  it('toEuler inverts fromEuler', () => {
+    const pitch = 0.3;
+    const yaw = -0.9;
+    const roll = 0.5;
+    const e = Quaternion.fromEuler(pitch, yaw, roll).toEuler();
+    expect(e.x).toBeCloseTo(pitch, 5);
+    expect(e.y).toBeCloseTo(yaw, 5);
+    expect(e.z).toBeCloseTo(roll, 5);
+  });
+});
+
 describe('Transform', () => {
   it('places the origin at its position', () => {
     const tr = new Transform(new Vector3(4, 5, 6));
