@@ -3,8 +3,9 @@ name: Deploy editor to GitHub Pages
 on:
   push:
     branches:
-      - claude/webgpu-engine-dependencies-6zpdpz
+      - master
       - main
+      - claude/webgpu-engine-dependencies-6zpdpz
   workflow_dispatch:
 
 # Permissions the deploy job needs to publish to Pages.
