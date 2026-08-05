@@ -4,6 +4,7 @@ import {
   createSceneRenderer,
   EditorHost,
   OrbitCamera,
+  OrbitCameraController,
   PhysicsWorld,
   Scene,
   SceneSerializer,
@@ -23,6 +24,8 @@ import { ViewportPanel } from './ViewportPanel';
 import { InspectorPanel } from './InspectorPanel';
 
 type Vec3 = [number, number, number];
+
+const DEG2RAD = Math.PI / 180;
 
 /**
  * Editor composition root. Builds the scene, script runtime, EditorHost and renderer, and
@@ -78,10 +81,13 @@ export function Editor() {
     const scene = new Scene();
     const camera = scene.root.addChild(new OrbitCamera('camera'));
     camera.active = true;
-    camera.focus = new Vector3(0, 2, 0);
+    camera.focus = new Vector3(0, 0, 0);
     camera.distance = 22;
-    camera.update({ orbitY: 25 });
+    camera.setOrbit(0, 20 * DEG2RAD);
     scene.refreshActiveCamera();
+
+    // Right-button drag orbits the camera about its focal point; the wheel zooms.
+    const cameraController = new OrbitCameraController(canvas, camera);
 
     const host = new EditorHost(scene);
     const runtime = new ScriptRuntime({
@@ -141,6 +147,7 @@ export function Editor() {
       disposed = true;
       if (poll) clearInterval(poll);
       off();
+      cameraController.dispose();
       handle?.destroy();
     };
   }, [refreshInspector]);

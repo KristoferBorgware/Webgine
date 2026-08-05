@@ -33,6 +33,7 @@ export * from './camera/FreeFloatCamera';
 export * from './systems/GpuContext';
 export * from './systems/CanvasResizer';
 export * from './systems/FrameRenderer';
+export * from './systems/OrbitCameraController';
 
 // Rendering
 export * from './render/mesh';
